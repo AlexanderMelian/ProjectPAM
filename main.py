@@ -1,39 +1,46 @@
 import pyarduino
 import functions
-##############
+import user_password
+
+###############
 from telegram.ext import Updater, MessageHandler, Filters
-##############
+###############
 needPassword = False
-
-def echo(update, context):
+###############
+def messageFilter(update, context):#This can filter messages
     global needPassword
-    logged = functions.isLoged(update.message.from_user.id)
-    if logged:
-        rta = functions.filterCommand(update.message.text, update.message.from_user.id)
+    banned = functions.isBanned(update.message.from_user.id)
+    if banned:
+        answ="You are banned"
+        update.message.reply_text(answ)
     else:
-        if needPassword == True:
-            password = functions.login(update.message.text)
-            if password:
-                rta = "Login complete"
-                functions.newUser(update.message.from_user.id, update.message.from_user.username)
-            else:
-                rta = "Login failed, restart login"
-            needPassword = False
+        logged = functions.isLoged(update.message.from_user.id)
+        if logged:
+            answ = functions.filterCommand(update.message.text, update.message.from_user.id)
         else:
-            needWritePassword = functions.filterLogin(update.message.text)
-            if needWritePassword:
-                rta = "Write the password"
-                needPassword = True
+            if needPassword == True:
+                password = functions.login(update.message.text)
+                if password:
+                    functions.newUser(update.message.from_user.id, update.message.from_user.username)
+                    answ = "Login complete"
+                else:
+                    answ = "Login failed, restart login"
+                needPassword = False
             else:
-                rta = "Error to login"
-    update.message.reply_text(rta)
+                needWritePassword = functions.filterLogin(update.message.text)
+                if needWritePassword:
+                    answ = "Write the password"
+                    needPassword = True
+                else:
+                    answ = "Error to login"
+        update.message.reply_text(answ)
 
-tk = "YOUR TOKEN"
+tk = user_password.token()
 updater = Updater(token=tk, use_context=True)  #change the token
 
 dp = updater.dispatcher
 
-dp.add_handler(MessageHandler(Filters.text, echo))
+dp.add_handler(MessageHandler(Filters.text, messageFilter))
 
 updater.start_polling()
 updater.idle()

@@ -1,5 +1,6 @@
 from pyfirmata import Arduino, util
-board = Arduino("YOUR PORT")#change the port
+import user_password
+board = Arduino(user_password.port())#change the port
 
 def ledOn():
     board.digital[13].write(1)

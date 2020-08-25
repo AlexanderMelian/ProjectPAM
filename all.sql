@@ -17,7 +17,7 @@ CREATE TABLE `records`(
 DROP TABLE IF EXISTS `devices`;
 
 CREATE TABLE `devices`(
-`device_id` INT UNSIGNED PRIMARY KEY,
-`owner_name` VARCHAR(20),
-`device_baned` TINYINT(1) NOT NULL DEFAULT 0
+    `device_id` INT UNSIGNED PRIMARY KEY,
+    `owner_name` VARCHAR(20),
+    `device_banned` TINYINT(1) NOT NULL DEFAULT 0
 );

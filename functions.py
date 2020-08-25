@@ -1,11 +1,12 @@
 import mysql.connector
 import pyarduino
+import user_password
 from hashlib import sha256
 
 mydb = mysql.connector.connect(
     host="localhost",
-    user="YOUR USER",  #change the user
-    password="YOUR PASSWORD",  #change the password
+    user=user_password.userU(),  #change the user
+    password=user_password.userPass(),  #change the password
     database="ProjectPAM")
 mycursor = mydb.cursor()
 
@@ -14,19 +15,28 @@ def isLoged(userId):
     adr = (userId, )
     mycursor.execute(sql,adr)
     myresult = mycursor.fetchall()
-    if len(myresult) == 0:
+    if len(myresult) == 0:#Len is 0 if there is not
         return False
     else:
-        ban = isBanned(myresult)
-        if ban:
-            return False
+        #ban = isBanned(myresult)#Check if the device is banned
+        #if ban:
+        #    return False
         return True
-    return False
+    #return False
 
-def isBanned(user):
-    if user[0][2]:
-        return True
-    return False
+def isBanned(userId):
+    sql = "SELECT device_banned FROM devices where device_id = %s;"
+    adr = (userId, )
+    mycursor.execute(sql,adr)
+    myresult = mycursor.fetchall()
+    if myresult[0][0]:
+        return True#IS BANNED
+    else:
+        return False# IS NOT BANNED
+    
+    #if user[0][2]:
+    #    return True#True is banned
+    #return False#False is not banned
 
 def newUser(userId, name):
     mycursor.execute("INSERT INTO devices (`device_id`,`owner_name`) VALUES (%s, %s);",(int(userId), name))
